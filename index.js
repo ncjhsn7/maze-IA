@@ -63,12 +63,15 @@ function heuristic(a,b){
     return Math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2);
 }
 
-function printGrid(grid, end){
+function printGrid(grid, current, foods){
     for(let i = 0; i < NxN; i++){
         for(let j = 0; j < NxN; j++){
-            let cell = !grid[i][j].wall ? ' - ' : ' x ';
-            if(grid[i][j] == end){
-                cell = ' !';
+            let cell = !grid[i][j].wall ? ' . ' : ' x ';
+            if(foods.includes(grid[i][j])){
+                cell = ' C ';
+            }
+            if(grid[i][j] == current){
+                cell = ' L ';
             }
             process.stdout.write(cell);
         }
@@ -77,14 +80,34 @@ function printGrid(grid, end){
 }
 
 function getCloserDot(current, foods){
-    let near = new Spot(100,100);
+    if(foods.length == 0){
+        return current;
+    }
+
+    let near = foods[0];
     foods.forEach(food => {
         if(heuristic(current, food) < heuristic(current,near)){
             near = food;
         }
     });
-    console.log(near.x, near.y);
     return near;
+}
+
+function showPath(current){
+    path = [];
+    let temp = current;
+    path.push(temp);
+    
+    while(temp.previous){
+        path.push(temp.previous);
+        temp = temp.previous;
+    }
+
+    path.reverse().forEach(element =>{
+        let x = String(element.x);
+        let y = String(element.y);
+        process.stdout.write(`${x}${y} \n`);
+    });
 }
 
 for(let i = 0; i < NxN; i++){
@@ -97,52 +120,55 @@ for(let i = 0; i < NxN; i++){
     }
 }
 
+
 for(let i = 0; i < NxN; i++){
     for(let j = 0; j < NxN; j++){
         grid[i][j].addNeighbors(grid);
     }
 }
 
+let foods = [grid[0][1], grid[0][2], grid[5][5], grid[7][3], grid[0][4],grid[NxN-1][NxN-1]];
+
+for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid.length; j++) {
+        if(foods.includes(grid[i][j])){
+            grid[i][j].wall = false;
+        }
+    }
+}
+
 let start = grid[0][0];
-//let end = grid[NxN - 1][NxN - 1];
-let foods = [grid[0,1], grid[0,2], grid[0][3]];
 let end = getCloserDot(start,foods);
 start.wall = false;
-printGrid(grid, end);
 
 let openSet = [];
 let closedSet = [];
 let path = [];
 openSet.push(start);
 
+printGrid(grid, start, foods);
 while(openSet.length > 0){
     let best = 0;
+
     for (let i = 0; i < openSet.length; i++) {
         if(openSet[i].f < openSet[best].f){
             best = i;
         }
     }
+
     let current = openSet[best];
 
-    // if(current == end && foods.length > 0){
-    //     foods.remove(end);
-    //     end = getNearlyDot(end, foods);
-    // }
-
     if(current == end){
-        path = [];
-        let temp = current;
-        path.push(temp);
-        while(temp.previous){
-            path.push(temp.previous);
-            temp = temp.previous;
+        showPath(current);
+        printGrid(grid, current, foods);
+        remove(foods, current);
+        end = getCloserDot(current, foods);
+        if(foods.length == 0){
+            console.log('feito')
         }
-        path.reverse().forEach(element =>{
-            let x = String(element.x);
-            let y = String(element.y);
-            process.stdout.write(`${x}${y} `);
-        })
     }
+
+    
     
     remove(openSet, current);    
     closedSet.push(current);
