@@ -63,7 +63,7 @@ function heuristic(a,b){
     return Math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2);
 }
 
-function printGrid(grid, end, foods){
+function printGrid(grid, end){
     for(let i = 0; i < NxN; i++){
         for(let j = 0; j < NxN; j++){
             let cell = !grid[i][j].wall ? ' - ' : ' x ';
@@ -74,6 +74,17 @@ function printGrid(grid, end, foods){
         }
         console.log();
     }
+}
+
+function getCloserDot(current, foods){
+    let near = new Spot(100,100);
+    foods.forEach(food => {
+        if(heuristic(current, food) < heuristic(current,near)){
+            near = food;
+        }
+    });
+    console.log(near.x, near.y);
+    return near;
 }
 
 for(let i = 0; i < NxN; i++){
@@ -94,19 +105,15 @@ for(let i = 0; i < NxN; i++){
 
 let start = grid[0][0];
 //let end = grid[NxN - 1][NxN - 1];
-let foods = [grid[0,1], grid[0,3], grid[3][0]];
-
-foods.forEach(node => {
-    node.wall = false;
-});
-
+let foods = [grid[0,1], grid[0,2], grid[0][3]];
+let end = getCloserDot(start,foods);
 start.wall = false;
+printGrid(grid, end);
+
 let openSet = [];
 let closedSet = [];
 let path = [];
-
 openSet.push(start);
-printGrid(grid,foods, start);
 
 while(openSet.length > 0){
     let best = 0;
@@ -117,7 +124,12 @@ while(openSet.length > 0){
     }
     let current = openSet[best];
 
-    if(foods.length > 0 && current == end){
+    // if(current == end && foods.length > 0){
+    //     foods.remove(end);
+    //     end = getNearlyDot(end, foods);
+    // }
+
+    if(current == end){
         path = [];
         let temp = current;
         path.push(temp);
