@@ -1,4 +1,4 @@
-const NxN = 10;
+const NxN = 4;
 let grid = new Array(NxN);
 
 function Spot(x,y){
@@ -67,12 +67,15 @@ function printGrid(grid, current, foods){
     for(let i = 0; i < NxN; i++){
         for(let j = 0; j < NxN; j++){
             let cell = !grid[i][j].wall ? ' . ' : ' x ';
+
             if(foods.includes(grid[i][j])){
                 cell = ' C ';
             }
+
             if(grid[i][j] == current){
                 cell = ' L ';
             }
+            
             process.stdout.write(cell);
         }
         console.log();
@@ -93,7 +96,7 @@ function getCloserDot(current, foods){
     return near;
 }
 
-function showPath(current){
+function getPath(current){
     path = [];
     let temp = current;
     path.push(temp);
@@ -108,6 +111,7 @@ function showPath(current){
         let y = String(element.y);
         process.stdout.write(`${x}${y} \n`);
     });
+    return path;
 }
 
 for(let i = 0; i < NxN; i++){
@@ -127,7 +131,7 @@ for(let i = 0; i < NxN; i++){
     }
 }
 
-let foods = [grid[0][1], grid[0][2], grid[5][5], grid[7][3], grid[0][4],grid[NxN-1][NxN-1]];
+let foods = [grid[0][1], grid[0][2], grid[1][2], grid[2][3], grid[0][3]];
 
 for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid.length; j++) {
@@ -159,7 +163,7 @@ while(openSet.length > 0){
     let current = openSet[best];
 
     if(current == end){
-        showPath(current);
+        path = getPath(current);
         printGrid(grid, current, foods);
         remove(foods, current);
         end = getCloserDot(current, foods);
