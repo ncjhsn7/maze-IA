@@ -60,10 +60,10 @@ function remove(arr, element){
 
 function heuristic(a,b){
     //return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-    return Math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2)
+    return Math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2);
 }
 
-function printGrid(grid, end){
+function printGrid(grid, end, foods){
     for(let i = 0; i < NxN; i++){
         for(let j = 0; j < NxN; j++){
             let cell = !grid[i][j].wall ? ' - ' : ' x ';
@@ -93,15 +93,20 @@ for(let i = 0; i < NxN; i++){
 }
 
 let start = grid[0][0];
-let end = grid[NxN - 1][NxN - 1]; //verificar se existe comida e recalcular 'end'
+//let end = grid[NxN - 1][NxN - 1];
+let foods = [grid[0,1], grid[0,3], grid[3][0]];
+
+foods.forEach(node => {
+    node.wall = false;
+});
+
 start.wall = false;
-end.wall = false;
 let openSet = [];
 let closedSet = [];
 let path = [];
 
 openSet.push(start);
-printGrid(grid,end, start);
+printGrid(grid,foods, start);
 
 while(openSet.length > 0){
     let best = 0;
@@ -111,8 +116,8 @@ while(openSet.length > 0){
         }
     }
     let current = openSet[best];
-    
-    if(current == end){
+
+    if(foods.length > 0 && current == end){
         path = [];
         let temp = current;
         path.push(temp);
