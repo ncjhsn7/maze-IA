@@ -1,4 +1,5 @@
 const NxN = 4;
+let NFOODS = NxN/2;
 let grid = new Array(NxN);
 
 function Spot(x,y){
@@ -11,7 +12,7 @@ function Spot(x,y){
     this.previous = null;
     this.wall = false;
 
-    if(Math.random(1) < 0.2){
+    if(Math.random(1) < 0.3){
         this.wall = true;
     }
 
@@ -114,24 +115,30 @@ function getPath(current){
     return path;
 }
 
-for(let i = 0; i < NxN; i++){
-    grid[i] = new Array(NxN);
-}
-
-for(let i = 0; i < NxN; i++){
-    for(let j = 0; j < NxN; j++){
-        grid[i][j] = new Spot(i,j);
+function generateGrid(){
+    let grid = [];
+    for(let i = 0; i < NxN; i++){
+        grid[i] = new Array(NxN);
     }
-}
-
-
-for(let i = 0; i < NxN; i++){
-    for(let j = 0; j < NxN; j++){
-        grid[i][j].addNeighbors(grid);
+    
+    for(let i = 0; i < NxN; i++){
+        for(let j = 0; j < NxN; j++){
+            grid[i][j] = new Spot(i,j);
+        }
     }
+    
+    
+    for(let i = 0; i < NxN; i++){
+        for(let j = 0; j < NxN; j++){
+            grid[i][j].addNeighbors(grid);
+        }
+    }
+
+    return grid;
 }
 
-let foods = [grid[0][1], grid[0][2], grid[1][2], grid[2][3], grid[0][3]];
+grid = generateGrid();
+let foods = [grid[NxN][NxN]];
 
 for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid.length; j++) {
@@ -167,13 +174,12 @@ while(openSet.length > 0){
         printGrid(grid, current, foods);
         remove(foods, current);
         end = getCloserDot(current, foods);
+
         if(foods.length == 0){
             console.log('feito')
         }
     }
 
-    
-    
     remove(openSet, current);    
     closedSet.push(current);
 
