@@ -140,11 +140,16 @@ function generateGrid() {
 }
 
 function generateFoods(grid, nFoods) {
-    foods = [];
-
-    grid.forEach(node => {
-        console.log(node);
-    });
+    let foods = [];
+    while (foods.length < nFoods) {
+        for (let i = 0; i < grid.length; i++) {
+            for (let j = 0; j < grid.length; j++) {
+                if (Math.random(1) < 0.8 && grid[i][j].x > 0 && grid[i][j].y > 0 && foods.length < nFoods) {
+                    foods.push(grid[i][j]);
+                }
+            }
+        }
+    }
 
     for (let i = 0; i < grid.length; i++) {
         for (let j = 0; j < grid.length; j++) {
@@ -153,11 +158,11 @@ function generateFoods(grid, nFoods) {
             }
         }
     }
-
+    return foods;
 }
 
 grid = generateGrid();
-let foods = [grid[NxN - 1][NxN - 1]]; //generateFoods(NxN/2); 
+let foods = generateFoods(grid, NxN / 2);
 
 for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid.length; j++) {
@@ -166,7 +171,6 @@ for (let i = 0; i < grid.length; i++) {
         }
     }
 }
-
 
 let start = grid[0][0];
 let end = getCloserDot(start, foods);
@@ -178,6 +182,7 @@ let path = [];
 openSet.push(start);
 
 printGrid(grid, start, foods);
+
 while (openSet.length > 0) {
     let best = 0;
 
