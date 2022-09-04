@@ -1,4 +1,4 @@
-const NxN = 4;
+const NxN = 6;
 let NFOODS = NxN / 2;
 let grid = new Array(NxN);
 
@@ -108,11 +108,21 @@ function getPath(current) {
         temp = temp.previous;
     }
 
-    path.reverse().forEach(element => {
-        let x = String(element.x);
-        let y = String(element.y);
-        process.stdout.write(`${x}${y} \n`);
-    });
+    for (let i = 0; i < NxN; i++) {
+        for (let j = 0; j < NxN; j++) {
+            let cell = !grid[i][j].wall ? ' . ' : ' x ';
+
+            if (grid[i][j] == current) {
+                cell = ' L ';
+            }
+
+            if (path.includes(grid[i][j])) {
+                cell = ' o ';
+            }
+            process.stdout.write(cell);
+        }
+        console.log();
+    }
 
     return path;
 }
@@ -144,7 +154,7 @@ function generateFoods(grid, nFoods) {
     while (foods.length < nFoods) {
         for (let i = 0; i < grid.length; i++) {
             for (let j = 0; j < grid.length; j++) {
-                if (Math.random(1) < 0.8 && grid[i][j].x > 0 && grid[i][j].y > 0 && foods.length < nFoods) {
+                if (Math.random(1) < 0.2 && grid[i][j].x > 0 && grid[i][j].y > 0 && foods.length < nFoods) {
                     foods.push(grid[i][j]);
                 }
             }
@@ -195,13 +205,11 @@ while (openSet.length > 0) {
     let current = openSet[best];
 
     if (current == end) {
-        //path = getPath(current);
-        printGrid(grid, current, foods);
         remove(foods, current);
         end = getCloserDot(current, foods);
-        if (foods.length == 0) {
-            console.log('feito')
-        }
+        path = getPath(current, grid);
+        openSet = [];
+        console.log();
     }
 
     remove(openSet, current);
@@ -213,10 +221,11 @@ while (openSet.length > 0) {
         let neighbor = neighbors[i];
 
         if (!closedSet.includes(neighbor) && !neighbor.wall) {
-            let tempG = current.g + 1;
+            let tryG = current.g + 1;
             let newPath = false;
-            if (!openSet.includes(neighbor) && tempG > neighbor.g) {
-                neighbor.g = tempG;
+
+            if (!openSet.includes(neighbor) && tryG > neighbor.g) {
+                neighbor.g = tryG;
                 openSet.push(neighbor);
                 newPath = true;
             }
