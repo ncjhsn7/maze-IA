@@ -1,4 +1,4 @@
-const NxN = 6;
+const NxN = 10;
 let NFOODS = NxN / 2;
 let grid = new Array(NxN);
 
@@ -98,7 +98,7 @@ function getCloserDot(current, foods) {
     return near;
 }
 
-function getPath(current) {
+function getPath(current, foods) {
     path = [];
     let temp = current;
     path.push(temp);
@@ -116,6 +116,10 @@ function getPath(current) {
                 cell = ' L ';
             }
 
+            if (foods.includes(grid[i][j])) {
+                cell = ' C ';
+            }
+
             if (path.includes(grid[i][j])) {
                 cell = ' o ';
             }
@@ -123,8 +127,6 @@ function getPath(current) {
         }
         console.log();
     }
-
-    return path;
 }
 
 function generateGrid() {
@@ -151,7 +153,7 @@ function generateGrid() {
 
 function generateFoods(grid, nFoods) {
     let foods = [];
-    while (foods.length < nFoods) {
+    while (foods.length < Math.floor(nFoods)) {
         for (let i = 0; i < grid.length; i++) {
             for (let j = 0; j < grid.length; j++) {
                 if (Math.random(1) < 0.2 && grid[i][j].x > 0 && grid[i][j].y > 0 && foods.length < nFoods) {
@@ -193,7 +195,7 @@ openSet.push(start);
 
 printGrid(grid, start, foods);
 
-while (openSet.length > 0) {
+while (foods.length > 0) {
     let best = 0;
 
     for (let i = 0; i < openSet.length; i++) {
@@ -204,22 +206,21 @@ while (openSet.length > 0) {
 
     let current = openSet[best];
 
+    if(current == end && foods.length == 0){
+        getPath(current, foods);
+        break;
+    }
+
     if (current == end) {
         remove(foods, current);
         end = getCloserDot(current, foods);
-        path = getPath(current, grid);
-        openSet = [];
-        console.log();
+        openSet = [current];
     }
 
     remove(openSet, current);
     closedSet.push(current);
 
-    var neighbors = current.neighbors;
-
-    for (let i = 0; i < neighbors.length; i++) {
-        let neighbor = neighbors[i];
-
+    current.neighbors.forEach(neighbor => {
         if (!closedSet.includes(neighbor) && !neighbor.wall) {
             let tryG = current.g + 1;
             let newPath = false;
@@ -236,6 +237,7 @@ while (openSet.length > 0) {
                 neighbor.previous = current;
             }
         }
-
-    }
+    });
+    getPath(current, foods);
+    console.log();
 }
