@@ -1,9 +1,9 @@
 '''Classe que representa um labiirinto'''
 
-class labiirinto:
+class Labirinto:
     def __init__(self):
         self.labi = []
-        arquivo = open('labiirinto.txt', 'r')
+        arquivo = open('labirinto.txt', 'r')
         i = 1
         for linha in arquivo:
             pos = linha.split(',')
@@ -12,8 +12,12 @@ class labiirinto:
             i += 1
         self.x = 0
         self.y = 0
+        self.comidas = len(self.labi[0]) // 2
 
-    def print_labiirinto(self):
+    def get_comidas(self):
+        return self.comidas
+
+    def print_labirinto(self):
         for i in range(0,10):
             print(self.labi[i])
         print('--------------------------------------------------')
@@ -27,27 +31,44 @@ class labiirinto:
             5: up left
             6: down right
             7: down left '''
-        self.labi[self.y][self.x] = ' '
         if movimento == 0:
-            self.y = self.y - 1
+            if (self.y-1 >= 0) and (self.labi[self.y-1][self.x] != '1'):
+                self.labi[self.y][self.x] = ' '
+                self.y = self.y - 1
         elif movimento == 1:
-            self.y = self.y + 1
+            if (self.y+1 < 10) and (self.labi[self.y+1][self.x] != '1'):
+                self.labi[self.y][self.x] = ' '
+                self.y = self.y + 1
         elif movimento == 2:
-            self.x = self.x + 1
+            if (self.x+1 < 10) and (self.labi[self.y][self.x+1] != '1'):
+                self.labi[self.y][self.x] = ' '
+                self.x = self.x + 1
         elif movimento == 3:
-            self.x = self.x - 1
+            if (self.x-1 >= 0) and (self.labi[self.y][self.x-1] != '1'):
+                self.labi[self.y][self.x] = ' '
+                self.x = self.x - 1
         elif movimento == 4:
-            self.y = self.y + 1
-            self.x = self.x + 1
+            if (self.y-1 >= 0) and (self.x+1 < 10) and (self.labi[self.y-1][self.x+1] != '1'):
+                self.labi[self.y][self.x] = ' '
+                self.y = self.y - 1
+                self.x = self.x + 1
         elif movimento == 5:
-            self.y = self.y - 1
-            self.x = self.x - 1
+            if (self.y-1 >= 0) and (self.x-1 >= 0) and (self.labi[self.y-1][self.x-1] != '1'):
+                self.labi[self.y][self.x] = ' '
+                self.y = self.y - 1
+                self.x = self.x - 1
         elif movimento == 6:
-            self.y = self.y + 1
-            self.x = self.x + 1
+            if (self.y+1 < 10) and (self.x+1 < 10) and (self.labi[self.y+1][self.x+1] != '1'):
+                self.labi[self.y][self.x] = ' '
+                self.y = self.y + 1
+                self.x = self.x + 1
         elif movimento == 7:
-            self.y = self.y + 1
-            self.x = self.x - 1
+            if (self.y+1 < 10) and (self.x-1 >= 0) and (self.labi[self.y+1][self.x-1] != '1'):
+                self.labi[self.y][self.x] = ' '
+                self.y = self.y + 1
+                self.x = self.x - 1
+        if(self.labi[self.y][self.x] == 'C'):
+            self.comidas -= 1
         self.labi[self.y][self.x] = 'E'
 
     def pode_mover(self, movimento):
@@ -92,6 +113,7 @@ class labiirinto:
                 return True
             return False
 
-labi = labiirinto()
-labi.print_labiirinto()
-print(labi.pode_mover(0))
+    def tem_comida(self):
+        if self.labi[self.y][self.x] == 'C':
+            return True
+        return False
