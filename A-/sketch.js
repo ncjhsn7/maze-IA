@@ -1,5 +1,17 @@
-const boardLength = 10;
-const fps = 10;
+let gridPDF = [
+    ['E', '1', '1', '1', '1', '1', '1', '1', ' ', '1'],
+    [' ', ' ', ' ', ' ', 'C', ' ', ' ', ' ', ' ', '1'],
+    ['1', '1', '1', ' ', '1', '1', '1', '1', '1', ' '],
+    [' ', ' ', '1', ' ', '1', ' ', ' ', ' ', ' ', ' '],
+    ['C', ' ', '1', ' ', '1', '1', ' ', '1', '1', '1'],
+    [' ', ' ', ' ', ' ', '1', 'C', ' ', ' ', ' ', ' '],
+    [' ', '1', '1', '1', '1', ' ', ' ', '1', ' ', 'C'],
+    [' ', '1', ' ', ' ', ' ', ' ', ' ', ' ', '1', '1'],
+    [' ', '1', '1', '1', '1', '1', '1', ' ', ' ', '1'],
+    ['C', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '1'],
+]
+const boardLength = gridPDF.length;
+const fps = 30;
 let w;
 let h;
 let grid = new Array(boardLength);
@@ -10,6 +22,7 @@ let end
 let path = [];
 let foods = [];
 
+
 function Node(x, y) {
     this.x = x;
     this.y = y;
@@ -19,10 +32,6 @@ function Node(x, y) {
     this.neighbors = [];
     this.previous = null;
 	this.wall = false;
-
-	if (Math.random(1) < 0.2 && this.x > 0 && this.y > 0) {
-        this.wall = true;
-    }
 
     this.show = (color) => {
         fill(color);
@@ -89,7 +98,7 @@ function removeElement(arr, element) {
 
 function heuristic(a, b) {
     //return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-    return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+    return Math.sqrt(((a.x - b.x) ** 2) + ((a.y - b.y) ** 2));
 }
 
 function showPath(current) {
@@ -148,28 +157,32 @@ function setup() {
     createCanvas(800, 800);
     background(0);
     frameRate(fps);
+
     w = width / boardLength;
     h = height / boardLength;
 
-    for (let i = 0; i < boardLength; i++) {
-        grid[i] = new Array(boardLength);
+    for (let i = 0; i < grid.length; i++) {
+        grid[i] = new Array(grid.length);
     }
 
-    for (let i = 0; i < boardLength; i++) {
-        for (let j = 0; j < boardLength; j++) {
+    for (let i = 0; i < grid.length; i++) {
+        for (let j = 0; j < grid.length; j++) {
             grid[i][j] = new Node(i, j);
-
+            grid[i][j].wall = false;//gridPDF[j][i] == '1';
+            
+            if(gridPDF[j][i] == 'C'){
+                foods.push(grid[i][j]); 
+            }
         }
     }
 
-    for (let i = 0; i < boardLength; i++) {
-        for (let j = 0; j < boardLength; j++) {
+    for (let i = 0; i < grid.length; i++) {
+        for (let j = 0; j < grid.length; j++) {
             grid[i][j].addNeighbors(grid);
         }
     }
 
     start = grid[0][0];
-	foods = generateFoods(grid, boardLength/2);
     toVisit.push(start);
 }
 
@@ -180,17 +193,14 @@ function draw() {
     }
 
     end = getCloserDot(start, foods);
-
     if (foods.length > 0) {
         let lowest = getLowestF(toVisit);
         var current = toVisit[lowest];
 
-        console.log('(',end.x,end.y,')');
-
         if(current == end){
             removeElement(foods, current);
-            toVisit = [];
-            toVisit.push(current);
+            toVisit = [current];
+            end = getCloserDot(current, foods);
         }
 
         removeElement(toVisit, current);
@@ -218,14 +228,17 @@ function draw() {
     } else {
 		console.log('sem caminho');
 		noLoop();
-		return;
 	}
 
     for (let i = 0; i < boardLength; i++) {
         for (let j = 0; j < boardLength; j++) {
-            grid[i][j].show(color(255));
+            grid[i][j].show(color(240));
         }
     }
+
+    foods.forEach(food => {
+        food.show(color(37, 204, 247));
+    });
 
 	visited.forEach(v => {
 		v.show(color(254, 164, 127));
@@ -235,12 +248,8 @@ function draw() {
 		v.show(color(109, 33, 79));
 	});    
 
-    foods.forEach(food => {
-        food.show(color(37, 204, 247));
-    });
-
     path = showPath(current);
-    
+
     path.forEach(v => {
 		v.show(color(59, 59, 152));
 	});
