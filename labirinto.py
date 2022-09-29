@@ -1,6 +1,7 @@
 '''Classe que representa um labiirinto'''
 
 class Labirinto:
+
     def __init__(self):
         self.labi = []
         arquivo = open('labirinto.txt', 'r')

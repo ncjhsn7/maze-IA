@@ -6,6 +6,7 @@ import random
 def main():
 
     populacao_inical = []
+    num_geracao = 1
 
     i = 0
     for n in range(5):
@@ -23,33 +24,51 @@ def main():
         populacao_inical.append(cromossomo_mov)
 
     melhor_aptidao = 100
-    elitismo_cromo = []
-    for n in range(len(populacao_inical)):
-        aptidao = populacao_inical[i][len(populacao_inical[i])-1]
-        if aptidao == 0:
-            print('Solução encontrada: {}'.format(populacao_inical[i])-1)
-            exit(1)
-        if aptidao < melhor_aptidao:
-            elitismo_cromo = populacao_inical[i]
-            melhor_aptidao = aptidao
+    geracao = populacao_inical
+    geracao_aux = []
+    num_geracao = 0
 
-    populacao_intermediaria = []
-    populacao_intermediaria.append(elitismo_cromo)
-    for i in range(len(populacao_inical)//2):
-        (pai, mae) = torneio(populacao_inical)
-        corte = randrange(len(pai))
-        filho1, filho2 = crossover(pai[:-1], mae[:-1], corte)
-        aptidao1 = calcula_aptidao(filho1)
-        aptidao2 = calcula_aptidao(filho2)
-        filho1.append(aptidao1)
-        filho2.append(aptidao2)
-        populacao_intermediaria.append(filho1)
-        populacao_intermediaria.append(filho2)
+    while num_geracao < 200:
 
-    mutacao(populacao_intermediaria)
+        elitismo_cromo = geracao[0]
+        n = 0
+        while n < len(geracao):
+            aptidao = geracao[n][len(geracao[i])-1]
+            if aptidao == 0:
+                print('Solução encontrada: {}'.format(geracao[i])-1)
+                exit(1)
+            if aptidao < melhor_aptidao:
+                elitismo_cromo = geracao[n]
+                melhor_aptidao = aptidao
+            n += 1
 
-    for individuo in populacao_intermediaria:
-        print(individuo)
+
+        geracao_aux.append(elitismo_cromo)
+        for i in range(len(geracao)//2):
+            (pai, mae) = torneio(geracao)
+            corte = randrange(len(pai))
+            filho1, filho2 = crossover(pai[:-1], mae[:-1], corte)
+            aptidao1 = calcula_aptidao(filho1)
+            aptidao2 = calcula_aptidao(filho2)
+            filho1.append(aptidao1)
+            filho2.append(aptidao2)
+            geracao_aux.append(filho1)
+            geracao_aux.append(filho2)
+
+        ocorre_mutacao = randrange(5)
+        if(ocorre_mutacao == 0):
+            mutacao(geracao)
+
+        index = 0
+        for individuo in geracao_aux:
+            print('Cromossomo {}: {}'.format(index,individuo))
+            index += 1
+        print('GERAÇÃO: {}'.format(num_geracao))
+        
+        geracao = geracao_aux
+        geracao_aux = []
+        num_geracao += 1
+        
 
 
 def crossover(a, b, index):
@@ -62,7 +81,10 @@ def mutacao(populacao):
     populacao[random_ind][random_index] = random_gene
 
 def torneio(populacao):
+    # for individuo in populacao:
+    #     print(individuo)
     indices = random.sample(range(len(populacao)), 4)
+    # print(indices)
     pai = []
     aptidao1 = populacao[indices[0]][len(populacao[indices[0]]) - 1]
     aptidao2 = populacao[indices[1]][len(populacao[indices[1]]) - 1]
