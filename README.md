@@ -5,4 +5,4 @@ Para executar o projeto no modo rápido (sem logs) deve-se rodar o seguinte coma
 Para executar o projeto e gerar os logs deve-se rodar o seguinte comando: 
 `python main.py`
 
-Para a solução utilizando o algoritmo A* basta abrir o arquivo `index.html` localizado na pasta `A-`
+Para executar a solução utilizando o algoritmo A* basta abrir o arquivo `index.html` localizado na pasta `A-`
